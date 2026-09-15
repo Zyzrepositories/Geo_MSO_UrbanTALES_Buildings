@@ -1,0 +1,22 @@
+name: urbantales-ml
+channels:
+  - pytorch
+  - nvidia
+  - conda-forge
+dependencies:
+  - python=3.10
+  - pytorch=2.5.1
+  - torchvision=0.20.1
+  - pytorch-cuda=11.8
+  - numpy=2.0
+  - scipy=1.14
+  - netcdf4=1.7
+  - pyyaml=6
+  - pandas=2.2
+  - matplotlib=3.9
+  - tqdm=4.67
+  - pytest=8
+  - pip
+  - pip:
+      - tensorboard==2.18.0
+

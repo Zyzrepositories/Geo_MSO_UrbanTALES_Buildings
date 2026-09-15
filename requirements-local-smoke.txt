@@ -1,0 +1,9 @@
+# CPU execution is sufficient for the local smoke test. Install torch from the
+# platform-appropriate PyTorch index, then install this file.
+numpy>=1.26,<2.1
+scipy>=1.11,<1.15
+netCDF4>=1.6,<1.8
+PyYAML>=6.0,<7
+tqdm>=4.66,<5
+pytest>=8,<9
+

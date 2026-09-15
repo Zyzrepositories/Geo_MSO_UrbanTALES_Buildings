@@ -1,0 +1,17 @@
+.venv/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+*.egg-info/
+.matplotlib/
+.ipynb_checkpoints/
+runs/
+*.pt
+*.npz
+
+# UrbanTALES raw data are downloaded separately.
+Idealized Building Blocks/
+Realistic Urban Neighbourhoods/
+metadata.csv
+UrbanTALES-flowdata.csv
+readme-urbanTALES datasheet.pdf
