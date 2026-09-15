@@ -1,0 +1,51 @@
+name: smoke_transfer_finetune
+seed: 20260904
+deterministic: true
+output_dir: runs/smoke_transfer_finetune
+
+data:
+  root: .
+  split_manifest: configs/splits/splits_v1.json
+  protocol: domain_transfer
+  transfer_scope: target_realistic
+  few_shot_percent: 25
+  targets: [uped, vped, Uped, TKEped]
+  patch_size_m: 32
+  output_pixels: 32
+  patches_per_case_train: 1
+  patches_per_case_eval: 1
+  height_scale_m: 50
+  sdf_scale_m: 32
+  u_tau_reference_m_s: 0.21
+  max_cache_cases: 1
+  max_train_cases: 1
+  max_val_cases: 1
+
+model:
+  name: geo_multiscale_operator
+  base_channels: 8
+  depth: 2
+  operator_levels: 2
+  modes: 4
+  use_film: true
+  predict_uncertainty: true
+
+loss:
+  task_weights: [1.0, 1.0, 1.0, 1.0]
+  gradient_weight: 0.05
+  use_uncertainty: true
+
+training:
+  device: auto
+  initial_checkpoint: runs/smoke_transfer_pretrain/best.pt
+  epochs: 1
+  batch_size: 1
+  learning_rate: 0.0001
+  weight_decay: 0.0001
+  gradient_accumulation: 1
+  num_workers: 0
+  pin_memory: false
+  amp: true
+  max_steps_per_epoch: 1
+  max_val_batches: 1
+
