@@ -1,0 +1,45 @@
+schema_version: 2
+protocol_id: urbantales_test_execution_v2
+status: frozen
+frozen_at: 2026-09-09
+change_policy: Any semantic change requires a new protocol_id and a new file.
+
+evaluation_protocol:
+  path: configs/evaluation/frozen_protocol_v1.yaml
+  sha256: 78d20eacd07e9c4a784f2498966ff4ee1b8120f123428568e523f05509abebd4
+final_primary_model_lock:
+  path: configs/evaluation/final_primary_model_lock_v1.json
+  sha256: 04b728ac99fea41a214763557aa097850ba08e2db0885715b156f254abccac66
+
+implementation:
+  release_creator:
+    path: scripts/create_test_release.py
+    sha256: 712f8c98e696003ce4fc469b71d0bd8c3f882d3cf841ab079dfad59662d86bd7
+  complete_field_evaluator:
+    path: scripts/evaluate_full_fields.py
+    sha256: 8aedb52de7e23f0a57bc359ec8e8e41ad42706f367a709f29b5ad4df15f55828
+
+release:
+  schema_version: 2
+  release_kind: urbantales_labelled_test_job
+  exactly_one_scope: true
+  exactly_one_config: true
+  exactly_one_checkpoint: true
+  exact_output_directory: true
+  one_time_consumption_marker_suffix: .used.json
+  allowed_scopes: [geometry_grouped, city_grouped, wind_held_out]
+  allowed_training_lock_statuses: [locked, frozen]
+
+complete_field_accuracy:
+  partition: test
+  stride_pixels: 128
+  batch_size: 4
+  save_arrays: false
+  explicit_case_ids: prohibited
+  max_cases: prohibited
+  checkpoint_only: true
+
+selection_safeguards:
+  test_targets_read_during_selection: false
+  test_results_may_select_models_or_hyperparameters: false
+  failed_or_interrupted_job_requires_new_release: true

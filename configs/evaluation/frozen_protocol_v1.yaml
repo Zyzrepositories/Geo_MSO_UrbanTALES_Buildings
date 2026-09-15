@@ -1,0 +1,130 @@
+schema_version: 1
+protocol_id: urbantales_thesis_evaluation_v1
+status: frozen
+frozen_at: 2026-09-05
+change_policy: Any semantic change requires a new protocol_id and a new file.
+
+artifacts:
+  split_manifest:
+    path: configs/splits/splits_v1.json
+    sha256: 23ee77be90a1028f05550471f2064ca5b4127fabb656372e2b0d49cf495e1997
+  case_name_map:
+    path: reports/literature_review/case_name_map.csv
+    sha256: cde6fd0b673baf6b861df365f9f6661dc8027809eb7d014f6808c2b312b3db3e
+
+partitions:
+  geometry_grouped:
+    role: primary_model_selection_and_final_test
+    train: {count: 376, ordered_ids_sha256: f2df41865dbc8348ecfb1a15774c1e8f68484793bcb7b362b12704e0f08ae639}
+    val: {count: 81, ordered_ids_sha256: c1ba5e7b1cda13161541468f38c746cb7d38d21bd96f464cc275ee21d2557ce1}
+    test: {count: 81, ordered_ids_sha256: 88da85dfe4fc02f6a4062ee7dc3295327a7354ef702a192820ca47b076d283fd}
+  city_grouped:
+    role: auxiliary_unseen_city_test
+    train: {count: 220, ordered_ids_sha256: 4e0ca98d4c1eec3ee89eee9e72476ffda801673830dc477a82d1a3be6cd6f926}
+    val: {count: 47, ordered_ids_sha256: 40e9dc27d951c88ef12b12d704461cb945a60aa6aba0243c7886ebc4352de1e4}
+    test: {count: 47, ordered_ids_sha256: 7111ff0dbbf41ee2fb141aba2262c017eed55c4ed3c2d2f41cccce3dd251b395}
+  wind_held_out:
+    role: auxiliary_unseen_direction_test
+    train: {count: 252, ordered_ids_sha256: e7c8b1eeb8072a90431822fae4554394008b893fd2075cfe05ca68822307abd8}
+    val: {count: 47, ordered_ids_sha256: 3ac9f7483126e4b9e4e336ad9998de8c18f4888ae75da9260293265d889d50ae}
+    test: {count: 149, ordered_ids_sha256: 1c9bdefea2a9ed2f1042ddb097feb118d4f75a1cadc34a8bac9be865d64e7429}
+  domain_transfer:
+    role: idealized_to_realistic_transfer
+    source_idealized:
+      val: {count: 24, ordered_ids_sha256: 76a490d5f428fbd90c316515df33784720c355195d4f507cc9b5cb09bdf18d6c}
+      test: {count: 24, ordered_ids_sha256: 41dca956b4c9b60c4ed018f9f765aa2fe7ddeb0e821a5e6ed71246569aac22be}
+    target_realistic:
+      val: {count: 47, ordered_ids_sha256: 1bb3d9d900bc1fae0fd4556196d3a221ffc4bfadd5f39a38181b8af9b262a14d}
+      test: {count: 47, ordered_ids_sha256: ae8b05d6249771a246b83c6f78784fa2601458b905f19948fa3f8cb468679b09}
+  val_resolution:
+    role: auxiliary_resolution_robustness_only
+    pair_count: 5
+    canonical_pairs_sha256: d63c8ca304f5d382d7e220e9e12d0b0040a8b988e919a310b43a674148c5d134
+
+model_selection:
+  split: geometry_grouped
+  checkpoint_rule: minimum_macro_validation_composite_loss
+  tuning_budget:
+    screening_seeds: [20260904]
+    confirmation_seeds: [20260904, 20260905, 20260906]
+  forbidden_until_locked:
+    - geometry_grouped_test_target_metrics
+    - auxiliary_test_target_metrics
+  final_reporting:
+    aggregation: macro_mean_over_complete_cases
+    uncertainty: mean_and_95_percent_seed_interval
+    seed_count: 3
+
+field_reconstruction:
+  model_pixel_size_m: 1.0
+  physical_patch_size_m: 256.0
+  patch_pixels: 256
+  stride_pixels: 128
+  boundary: periodic
+  blending: clamped_nonperiodic_Hann
+  hann_floor: 0.001
+  target_reconstruction: identical_coordinates_and_weights_as_prediction
+  final_accuracy_partition: geometry_grouped.test
+
+metrics:
+  primary:
+    - Uped/physical_m_s/mae
+    - Uped/physical_m_s/rmse
+    - Uped/physical_m_s/relative_l2
+    - TKEped/physical_m2_s2/mae
+  secondary:
+    - component_velocity_errors
+    - vector_magnitude_and_direction_errors
+    - near_building_errors
+    - high_gradient_errors
+    - Pearson_spatial_correlation
+    - horizontal_divergence_slice_diagnostic
+    - uncertainty_NLL_and_coverage
+  region_thresholds:
+    near_building_distance_m: 8.0
+    high_gradient_quantile: 0.90
+    minimum_direction_speed_m_s: 0.10
+  caveats:
+    - Horizontal divergence is a 2D slice diagnostic, not 3D mass conservation.
+    - Uped is evaluated as an independent released variable, not forced to sqrt(uped^2+vped^2).
+
+latency:
+  run_after_model_and_hyperparameters_are_locked: true
+  exclusive_gpu_required: true
+  hardware:
+    gpu: NVIDIA GeForce RTX 4090 D
+    gpu_count: 1
+    cpu_quota_vcpu: 16
+  precision: CUDA_amp_float16
+  patch_model_only:
+    input_shape_per_sample: [6, 256, 256]
+    batch_sizes: [1, 4]
+    warmup_repeats: 20
+    measured_repeats: 100
+    synchronization: torch_cuda_synchronize_before_and_after
+    statistics: [median, p90, mean, standard_deviation]
+  full_field_deployment:
+    target_fields_loaded: false
+    target_reconstruction_and_metrics_included: false
+    batch_size: 4
+    warmup_repeats_per_case: 1
+    measured_repeats_per_case: 5
+    report_phases:
+      - geometry_file_load
+      - input_preprocessing
+      - host_to_device
+      - GPU_forward
+      - device_to_host
+      - overlap_add_stitching
+      - total_online
+    sentinel_selection: nearest_area_quantiles_0_25_50_75_100_from_geometry_grouped_test
+    sentinel_case_ids:
+      - VS64-CL-28_d00
+      - UA16_d00
+      - US-Det-U6_d90
+      - TA-DC-U1_d00
+      - US-WestPhoenix
+  speedup_reporting:
+    formula: matched_CFD_wall_seconds / surrogate_total_online_seconds
+    require_same_case_and_documented_CFD_resources: true
+    prohibit_using_GPU_forward_only_as_CFD_speedup: true

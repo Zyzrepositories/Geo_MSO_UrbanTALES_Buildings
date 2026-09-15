@@ -1,0 +1,22 @@
+schema_version: 1
+protocol_id: urbantales_latency_execution_v1
+status: frozen
+frozen_at: 2026-09-09
+change_policy: Any semantic change requires a new protocol_id and a new file.
+
+evaluation_protocol:
+  path: configs/evaluation/frozen_protocol_v1.yaml
+  sha256: 78d20eacd07e9c4a784f2498966ff4ee1b8120f123428568e523f05509abebd4
+model_lock:
+  path: configs/evaluation/final_primary_model_lock_v1.json
+  sha256: 04b728ac99fea41a214763557aa097850ba08e2db0885715b156f254abccac66
+implementation:
+  path: scripts/benchmark_latency.py
+  sha256: 99424fc4c866b01d4e6ee22743022ecf7cd7789ba219224e75868540e9f9b5d0
+
+execution:
+  checkpoint_seed: 20260904
+  target_fields_loaded: false
+  exclusive_gpu: true
+  output_directory_must_be_empty: true
+  repeat_policy: one_formal_run_on_locked_hardware

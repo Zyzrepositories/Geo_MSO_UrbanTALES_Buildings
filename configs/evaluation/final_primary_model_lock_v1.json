@@ -1,0 +1,63 @@
+{
+  "schema_version": 1,
+  "lock_id": "urbantales_final_primary_model_v1",
+  "status": "locked",
+  "locked_at": "2026-09-09",
+  "evaluation_protocol": {
+    "path": "configs/evaluation/frozen_protocol_v1.yaml",
+    "sha256": "78d20eacd07e9c4a784f2498966ff4ee1b8120f123428568e523f05509abebd4"
+  },
+  "source_locks": {
+    "configuration": {
+      "path": "configs/evaluation/formal_primary_config_lock_v1.json",
+      "sha256": "8cbfdbb73c2d2eb764ec757303f66a260f5568b84f117fdab18039c71310ae5e"
+    },
+    "three_seed_confirmation": {
+      "path": "configs/evaluation/formal_confirmation_lock_v1.json",
+      "sha256": "f691e996a3777884f3a3f2c41014fa6b30da205d7b7f935ef8f84e02e600e004"
+    },
+    "ablation": {
+      "path": "configs/evaluation/ablation_decision_lock_v1.json",
+      "sha256": "6d269763ca74569c7844c7c5227e772ac0daf0d629e4aa67362020c9eeb55e03"
+    },
+    "transfer": {
+      "path": "configs/evaluation/transfer_decision_lock_v1.json",
+      "sha256": "67c49731055b0d810ddc5c0cb2096ceaca444d9893e73fed3fc445cb771253dc"
+    }
+  },
+  "selected_model": "geo_multiscale_operator",
+  "selected_config": {
+    "path": "configs/experiments/autodl_4090d_main_v1.yaml",
+    "sha256": "4a240f9305fee70b3246f57868df70bc1434f6a01aa4bf9be044801bc4d81547"
+  },
+  "selected_components": {
+    "sdf_input": true,
+    "operator_levels": 2,
+    "film_conditioning": true,
+    "gradient_weight": 0.1,
+    "heteroscedastic_uncertainty": true
+  },
+  "confirmation_seeds": [20260904, 20260905, 20260906],
+  "selected_checkpoints": [
+    {"seed": 20260904, "run": "screen5_main_v1", "best_epoch": 49, "sha256": "5cff9195ad4f1fe74d84870abcc82e7fbc1e4a0740b88bf781380ad0a29762be"},
+    {"seed": 20260905, "run": "formal_main_seed20260905_v1", "best_epoch": 53, "sha256": "d7d4ccf21fa239b8ad0d49e676bd79bd85bf490fdc3f45cf4dc0a1133e37b68e"},
+    {"seed": 20260906, "run": "formal_main_seed20260906_v1", "best_epoch": 62, "sha256": "05f961bd826bb650d20cbdfb3c6c92a2aa40acef03e602e7e7dbc86d43d59f6a"}
+  ],
+  "interpretation_constraints": {
+    "gradient_term_supported_for": [
+      "lower vector error across all three paired seeds",
+      "lower uped-component MAE across all three paired seeds",
+      "lower horizontal-divergence slice error across all three paired seeds"
+    ],
+    "gradient_term_not_supported_for": [
+      "lower high-gradient scalar Uped MAE"
+    ],
+    "uncertainty_status": "uncalibrated_undercoverage_must_be_reported",
+    "transfer_status": "tested_naive_adaptation_is_a_negative_transfer_boundary"
+  },
+  "model_and_hyperparameter_selection": "closed",
+  "primary_test_access_status": "closed_pending_release_artifacts",
+  "latency_reference_seed": 20260904,
+  "test_targets_read": false
+}
+
